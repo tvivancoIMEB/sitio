@@ -1,6 +1,7 @@
 // Descarga el contenido de cualquier WordPress vía REST API y lo guarda en src/data/content.json
 // Reutilizable: solo cambia WP_URL. Uso: WP_URL=https://www.sitio.cl npm run sync
 import { mkdir, writeFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 
 const WP = (process.env.WP_URL || 'https://www.municipalidadelbosque.cl').replace(/\/$/, '');
 const API = `${WP}/wp-json/wp/v2`;
@@ -49,6 +50,7 @@ const slim = (i) => ({
 
 const FIELDS = 'id,slug,link,title,content,excerpt,date,modified,categories,featured_media,parent,_links,_embedded';
 
+try {
 const [posts, pages, categories] = await Promise.all([
   fetchAll('posts', FIELDS, '&_embed=wp:featuredmedia'),
   fetchAll('pages', FIELDS, '&_embed=wp:featuredmedia'),
@@ -66,3 +68,12 @@ const data = {
 await mkdir('src/data', { recursive: true });
 await writeFile('src/data/content.json', JSON.stringify(data));
 console.log(`OK → ${data.posts.length} posts, ${data.pages.length} páginas, ${data.categories.length} categorías`);
+} catch (err) {
+  // Si WordPress no responde (o bloquea la IP del build), seguimos con la última copia guardada.
+  if (existsSync('src/data/content.json')) {
+    console.warn(`⚠ No se pudo sincronizar (${err.message}). Se usa la copia existente de src/data/content.json`);
+  } else {
+    console.error(`✗ No se pudo sincronizar y no hay copia previa: ${err.message}`);
+    process.exit(1);
+  }
+}
