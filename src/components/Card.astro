@@ -1,0 +1,14 @@
+---
+import { fmtDate, plain, type Item } from '../lib/content';
+interface Props { post: Item }
+const { post } = Astro.props;
+const resumen = plain(post.excerpt || post.html).slice(0, 140);
+---
+<article class="card">
+  {post.image && <a href={post.path} tabindex="-1" aria-hidden="true"><img src={post.image} alt={post.imageAlt} loading="lazy" decoding="async" width="640" height="400" /></a>}
+  <div class="body">
+    <div class="meta">{fmtDate(post.date)}</div>
+    <h3><a href={post.path} set:html={post.title} /></h3>
+    {resumen && <p class="excerpt">{resumen}…</p>}
+  </div>
+</article>

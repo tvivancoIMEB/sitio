@@ -1,0 +1,30 @@
+---
+// Una sola ruta para TODO el contenido: usa el mismo path que WordPress → las URLs no cambian.
+import Base from '../layouts/Base.astro';
+import { posts, pages, cleanHtml, isDivi, plain, fmtDate, type Item } from '../lib/content';
+
+export function getStaticPaths() {
+  const seen = new Set<string>(['/', '/noticias/']);
+  const all: (Item & { kind: 'post' | 'page' })[] = [
+    ...pages.map((p) => ({ ...p, kind: 'page' as const })),
+    ...posts.map((p) => ({ ...p, kind: 'post' as const })),
+  ];
+  return all
+    .filter((i) => !seen.has(i.path) && seen.add(i.path))
+    .map((i) => ({ params: { slug: i.path.replace(/^\/|\/$/g, '') }, props: { item: i } }));
+}
+const { item } = Astro.props;
+const divi = isDivi(item.html);
+const html = cleanHtml(item.html);
+---
+<Base title={plain(item.title)} description={plain(item.excerpt || item.html).slice(0, 155)} path={item.path} image={item.image}>
+  <div class="wrap">
+    <article class="entry">
+      {item.kind === 'post' && <div class="meta">{fmtDate(item.date)}</div>}
+      <h1 set:html={item.title} />
+      {item.kind === 'post' && item.image && <img class="featured" src={item.image} alt={item.imageAlt} width="1000" height="560" fetchpriority="high" />}
+      {divi && item.kind === 'page' && <p class="notice">Página original construida con Divi: pendiente de rehacer como componente.</p>}
+      <div class="content" set:html={html} />
+    </article>
+  </div>
+</Base>

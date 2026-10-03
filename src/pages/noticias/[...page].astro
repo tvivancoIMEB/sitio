@@ -1,0 +1,29 @@
+---
+import Base from '../../layouts/Base.astro';
+import Card from '../../components/Card.astro';
+import { posts } from '../../lib/content';
+
+export function getStaticPaths() {
+  const PER = 24;
+  const total = Math.ceil(posts.length / PER);
+  return Array.from({ length: total }, (_, i) => ({
+    params: { page: i === 0 ? undefined : String(i + 1) },
+    props: { n: i + 1, total },
+  }));
+}
+const { n, total } = Astro.props;
+const PER = 24;
+const slice = posts.slice((n - 1) * PER, n * PER);
+const href = (i: number) => (i === 1 ? '/noticias/' : `/noticias/${i}/`);
+---
+<Base title={n === 1 ? 'Noticias' : `Noticias – página ${n}`} path={href(n)}>
+  <div class="wrap">
+    <h2 class="sec">Noticias</h2>
+    <div class="grid">{slice.map((p) => <Card post={p} />)}</div>
+    <nav class="pager" aria-label="Paginación">
+      {n > 1 && <a href={href(n - 1)}>← Anterior</a>}
+      <span class="cur">{n} / {total}</span>
+      {n < total && <a href={href(n + 1)}>Siguiente →</a>}
+    </nav>
+  </div>
+</Base>

@@ -1,0 +1,30 @@
+---
+import Base from '../layouts/Base.astro';
+import Card from '../components/Card.astro';
+import { posts, postsInCategory } from '../lib/content';
+
+const noticias = posts.filter((p) => !p.path.startsWith('/cartelera-de-eventos/') && !p.path.startsWith('/licitaciones')).slice(0, 8);
+const cartelera = postsInCategory('cartelera-de-eventos').slice(0, 4);
+---
+<Base title="Inicio" path="/">
+  <section class="hero">
+    <div class="wrap">
+      <h1>El Bosque Ciudadano para todos y todas</h1>
+      <p>Noticias, trámites y servicios de la Ilustre Municipalidad de El Bosque.</p>
+    </div>
+  </section>
+  <div class="wrap">
+    <div class="quick">
+      <a href="/tramites-estado/">Trámites</a>
+      <a href="/farmacia-municipal/">Farmacia Municipal</a>
+      <a href="/direcciones/direccion-de-salud-municipal/">Salud</a>
+      <a href="/cartelera-de-eventos/">Cartelera</a>
+      <a href="/concejo-municipal/">Concejo Municipal</a>
+    </div>
+    <h2 class="sec">Noticias</h2>
+    <div class="grid">{noticias.map((p) => <Card post={p} />)}</div>
+    <p><a href="/noticias/">Ver todas las noticias →</a></p>
+    <h2 class="sec">Cartelera de eventos</h2>
+    <div class="grid">{cartelera.map((p) => <Card post={p} />)}</div>
+  </div>
+</Base>

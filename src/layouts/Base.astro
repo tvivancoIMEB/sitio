@@ -1,0 +1,66 @@
+---
+import '../styles/global.css';
+interface Props { title: string; description?: string; path?: string; image?: string | null; }
+const { title, description = 'El Bosque Ciudadano para todos y todas', path = '/', image = null } = Astro.props;
+const url = new URL(path, Astro.site).href;
+const menu = [
+  { label: 'La comuna', href: '/la-comuna/' },
+  { label: 'Autoridades', href: '/alcalde/', sub: [
+    { label: 'Alcalde', href: '/alcalde/' },
+    { label: 'Concejo Municipal', href: '/concejo-municipal/' },
+    { label: 'Organigrama', href: '/organigrama/' },
+  ] },
+  { label: 'Direcciones', href: '/direcciones/secretaria-municipal/', sub: [
+    { label: 'Secretaría Municipal', href: '/direcciones/secretaria-municipal/' },
+    { label: 'Salud Municipal', href: '/direcciones/direccion-de-salud-municipal/' },
+    { label: 'Obras Municipales', href: '/direcciones/direccion-de-obras-municipales/' },
+    { label: 'Desarrollo Social', href: '/direcciones/direccion-de-desarrollo-social/' },
+  ] },
+  { label: 'Noticias', href: '/noticias/' },
+  { label: 'Cartelera', href: '/cartelera-de-eventos/' },
+  { label: 'Trámites', href: '/tramites-estado/' },
+];
+---
+<!doctype html>
+<html lang="es-CL">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title === 'Inicio' ? 'Ilustre Municipalidad de El Bosque' : `${title} – Municipalidad de El Bosque`}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={url} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={url} />
+  {image && <meta property="og:image" content={image} />}
+</head>
+<body>
+  <a class="skip" href="#main">Saltar al contenido</a>
+  <div class="topbar"><div class="wrap"><span>☎ 22 482 3900</span><span>El Bosque Ciudadano para todos y todas</span></div></div>
+  <header class="site-header">
+    <div class="wrap bar">
+      <a class="brand" href="/">Municipalidad<br /><strong>de El Bosque</strong></a>
+      <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-label="Abrir menú" />
+      <label for="nav-toggle" class="burger" aria-hidden="true">☰</label>
+      <nav aria-label="Principal">
+        <ul>
+          {menu.map((m) => (
+            <li class={m.sub ? 'has-sub' : ''}>
+              <a href={m.href}>{m.label}</a>
+              {m.sub && <ul class="sub">{m.sub.map((s) => <li><a href={s.href}>{s.label}</a></li>)}</ul>}
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+  </header>
+  <main id="main"><slot /></main>
+  <footer class="site-footer">
+    <div class="wrap">
+      <p><strong>Ilustre Municipalidad de El Bosque</strong> · Av. Central Cornelio Saavedra 2290, El Bosque, Santiago · ☎ 22 482 3900</p>
+      <p class="muted">Prototipo estático · HTML puro, casi sin JavaScript</p>
+    </div>
+  </footer>
+</body>
+</html>
