@@ -5,7 +5,8 @@
   "scripts": {
     "sync": "node scripts/sync-wp.mjs",
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "node scripts/sync-wp.mjs && astro build",
+    "build:fast": "astro build",
     "preview": "astro preview"
   },
   "dependencies": {
